@@ -6,15 +6,28 @@
             pos: self.pos
             size: self.size
     shark: shark
+    obstacle: obstacle
     Shark:
         id: shark
         pos: root.width / 4, root.height / 2
+    Obstacle:
+        id: obstacle
+        pos: root.width, root.height / 2
         
 <Shark>:
     size: 50, 50
     canvas:
         Color:
             rgb: 0, 1, 0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<Obstacle>:
+    size: 50, 200
+    canvas:
+        Color:
+            rgb: 1, 0, 0
         Rectangle:
             pos: self.pos
             size: self.size
