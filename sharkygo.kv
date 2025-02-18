@@ -1,25 +1,42 @@
+<MenuScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            text: 'Start Game'
+            on_press: root.manager.current = 'game'
+        Button:
+            text: 'Quit'
+            on_press: app.stop()
+
+<GameScreen>:
+    SharkyGoGame:
+        id: game
+
 <SharkyGoGame>:
+    shark: shark
+    obstacle: obstacle
+    score: root.score
     canvas:
         Color:
             rgb: 0, 0, 0
         Rectangle:
             pos: self.pos
             size: self.size
-    shark: shark
-    obstacle: obstacle
-    score: root.score
+
     Shark:
         id: shark
         pos: root.width / 4, root.height / 2
+
     Obstacle:
         id: obstacle
         pos: root.width, root.height / 2
+
     Label:
         text: str(root.score)
         pos: root.width - 100, root.height - 50
         font_size: 30
         color: 1, 1, 1, 1
-        
+
 <Shark>:
     size: 50, 50
     canvas:
@@ -37,15 +54,3 @@
         Rectangle:
             pos: self.pos
             size: self.size
-
-<MenuScreen>:
-    BoxLayout:
-        orientation: 'vertical'
-        Button:
-            text: 'Start Game'
-            on_press: root.manager.current = 'game'
-        Button:
-            text: 'Quit'
-            on_press: app.stop()
-<GameScreen>:
-    SharkyGoGame:
