@@ -8,6 +8,7 @@ from kivy.core.window import Window
 class SharkyGoGame(Widget):
     shark = ObjectProperty(None)
     obstacle = ObjectProperty(None)
+    score = NumericProperty(0)
 
     def update(self, dt):
         self.shark.move()
@@ -15,6 +16,15 @@ class SharkyGoGame(Widget):
 
         if self.shark.collide_widget(self.obstacle):
             print("Game Over!")
+            
+        if self.obstacle.x < -50:
+            self.score += 1
+            self.obstacle.x = self.width
+            if self.score % 5 == 0:
+                self.change_level()
+    
+    def change_level(self):
+        print("Harder!!!")
 
     def on_touch_down(self, touch):
         self.shark.velocity_y = 5
