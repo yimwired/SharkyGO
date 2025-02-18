@@ -4,17 +4,28 @@ from kivy.properties import NumericProperty, ReferenceListProperty
 from kivy.vector import Vector
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.core.audio import SoundLoader
 
 class SharkyGoGame(Widget):
     shark = ObjectProperty(None)
     obstacle = ObjectProperty(None)
     score = NumericProperty(0)
+    
+    def __init__(self, **kwargs):
+        super(SharkyGoGame, self).__init__(**kwargs)
+        self.background_music = SoundLoader.load('assets/sounds/BackgroundMermaid.mp3')
+        self.collision_sound = SoundLoader.load('assets/sounds/hit.wav')
+        if self.background_music:
+            self.background_music.loop = True
+            self.background_music.play() 
 
     def update(self, dt):
         self.shark.move()
         self.obstacle.move()
 
         if self.shark.collide_widget(self.obstacle):
+            if self.collision_sound:
+                self.collision_sound.play()
             print("Game Over!")
             
         if self.obstacle.x < -50:
