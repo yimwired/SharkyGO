@@ -37,3 +37,15 @@
         Rectangle:
             pos: self.pos
             size: self.size
+
+<MenuScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            text: 'Start Game'
+            on_press: root.manager.current = 'game'
+        Button:
+            text: 'Quit'
+            on_press: app.stop()
+<GameScreen>:
+    SharkyGoGame:

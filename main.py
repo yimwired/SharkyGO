@@ -5,6 +5,13 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
+from kivy.uix.screenmanager import ScreenManager, Screen
+
+class MenuScreen(Screen):
+    pass
+
+class GameScreen(Screen):
+    pass
 
 class SharkyGoGame(Widget):
     shark = ObjectProperty(None)
@@ -45,9 +52,10 @@ class SharkyGoGame(Widget):
 
 class SharkyGoApp(App):
     def build(self):
-        game = SharkyGoGame()
-        Clock.schedule_interval(game.update, 1.0 / 60.0)
-        return game
+        sm = ScreenManager()
+        sm.add_widget(MenuScreen(name='menu'))
+        sm.add_widget(GameScreen(name='game'))
+        return sm
 
 class Shark(Widget):
     velocity_y = NumericProperty(0)
