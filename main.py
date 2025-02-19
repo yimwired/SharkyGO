@@ -1,6 +1,7 @@
 from kivy.app import App
 from kivy.uix.widget import Widget, ObjectProperty
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, ReferenceListProperty
+from kivy.vector import Vector
 from kivy.core.audio import SoundLoader
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
@@ -43,15 +44,40 @@ class SharkyGoGame(Widget):
                 print("Harder!!!")
 
     def on_touch_down(self, touch):
-        self.shark.velocity_y = 5
-
-    def on_touch_up(self, touch):
-        self.shark.velocity_y = -5
+        self.shark.jump()
 
 class Shark(Widget):
-    velocity_y = NumericProperty(0)
+    velocity = ReferenceListProperty(NumericProperty(0), NumericProperty(0))
+    gravity = -0.3
+    jump_force = 7
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.velocity = Vector(0, 0)
+        self.start_x = 0 #กำหนดจุดเริ่ม
+
     def move(self):
-        self.y += self.velocity_y
+        #vector
+        self.velocity = Vector(self.velocity[0], self.velocity[1] + self.gravity)
+        self.y += self.velocity[1]
+        
+        #ล็อกจุด
+        if self.start_x == 0:
+            self.start_x = self.x
+        self.x = self.start_x  
+
+        #กันหลุกขอบ
+        if self.y < 0:
+            self.y = 0
+            self.velocity = (0, 0)
+        
+        #กันขอบบน
+        if self.top > self.parent.height:
+            self.top = self.parent.height
+            self.velocity = (0, 0)
+
+    def jump(self):
+        self.velocity = Vector(0, self.jump_force)
 
 class Obstacle(Widget):
     velocity_x = NumericProperty(-5)
