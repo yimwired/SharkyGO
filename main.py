@@ -56,8 +56,19 @@ class SharkyGoGame(Widget):
                 print("Harder!!!")
 
     def on_touch_down(self, touch):
-        if not self.game_over:
+        if self.game_over:
+            self.restart_game()
+        else:
             self.shark.jump()
+
+    def restart_game(self):
+        self.score = 0
+        self.game_over = False
+        self.shark.y = self.height / 2  # Reset shark position
+        self.shark.velocity = Vector(0, 0)  # Reset velocity
+        self.reset_pipes()
+        Clock.schedule_interval(self.update, 1.0 / 60.0)  # Resume the game loop
+
 
     def end_game(self):
         self.game_over = True
