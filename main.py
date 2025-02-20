@@ -27,7 +27,7 @@ class SharkyGoGame(Widget):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.collision_sound = SoundLoader.load('assets/sounds/hit.wav')
+        self.collision_sound = SoundLoader.load('assets/sounds/hitcute.mp3')
 
     def update(self, dt):
         if self.game_over:
@@ -37,10 +37,10 @@ class SharkyGoGame(Widget):
         self.obstacle.move()
 
         if self.shark.y <= 0 or self.shark.top >= self.height:
-            self.end_game()#เรียกฟังก์ชันจบเกม
+            self.end_game()#เรียกฟังก์ชันจบเกมตอนชนบนล่าง
 
         if self.shark.collide_widget(self.obstacle):
-            self.end_game()
+            self.end_game()#เรียกฟังก์ชันจบเกมชนobject
 
         if self.obstacle.x < -50:
             self.score += 1
@@ -73,7 +73,7 @@ class Shark(Widget):
         #vector
         self.velocity = Vector(self.velocity[0], self.velocity[1] + self.gravity)
         self.y += self.velocity[1]
-        
+
         #ล็อกจุด
         if self.start_x == 0:
             self.start_x = self.x
@@ -83,7 +83,7 @@ class Shark(Widget):
         if self.y < 0:
             self.y = 0
             self.velocity = (0, 0)
-        
+
         #กันขอบบน
         if self.top > self.parent.height:
             self.top = self.parent.height
@@ -91,6 +91,8 @@ class Shark(Widget):
 
     def jump(self):
         self.velocity = Vector(0, self.jump_force)
+        self.jump_sound = SoundLoader.load('assets/sounds/hitcute.mp3')
+        self.jump_sound.play()
 
 class Obstacle(Widget):
     velocity_x = NumericProperty(-5)
