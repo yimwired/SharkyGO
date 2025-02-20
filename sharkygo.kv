@@ -14,11 +14,12 @@
 
 <SharkyGoGame>:
     shark: shark
-    obstacle: obstacle
+    top_pipe: top_pipe
+    bottom_pipe: bottom_pipe
     score: root.score
     canvas:
         Color:
-            rgb: 0, 0, 0
+            rgb: 0.2, 0.6, 1
         Rectangle:
             pos: self.pos
             size: self.size
@@ -27,9 +28,14 @@
         id: shark
         pos: root.width / 4, root.height / 2
 
-    Obstacle:
-        id: obstacle
-        pos: root.width, root.height / 2
+    Pipe:
+        id: top_pipe
+        size: 70, 300
+        pos: root.width, root.height - 300
+    Pipe:
+        id: bottom_pipe
+        size: 70, 300
+        pos: root.width, 0
 
     Label:
         text: str(root.score)
@@ -46,8 +52,7 @@
             pos: self.pos
             size: self.size
 
-<Obstacle>:
-    size: 50, 200
+<Pipe>:
     canvas:
         Color:
             rgb: 1, 0, 0

@@ -5,6 +5,7 @@ from kivy.vector import Vector
 from kivy.core.audio import SoundLoader
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
+import random
 
 class MenuScreen(Screen):
     def on_enter(self):
@@ -21,7 +22,8 @@ class GameScreen(Screen):
 
 class SharkyGoGame(Widget):
     shark = ObjectProperty(None)
-    obstacle = ObjectProperty(None)
+    top_pipe = ObjectProperty(None)
+    bottom_pipe = ObjectProperty(None)
     score = NumericProperty(0)
     game_over = False #จนกว่าจะจบ
 
@@ -34,17 +36,18 @@ class SharkyGoGame(Widget):
             return #จบแล้วพอ อย่ายื้อ เอื้อ เจ็บ
 
         self.shark.move()
-        self.obstacle.move()
+        self.top_pipe.move()
+        self.bottom_pipe.move()
 
         if self.shark.y <= 0 or self.shark.top >= self.height:
             self.end_game()#เรียกฟังก์ชันจบเกมตอนชนบนล่าง
 
-        if self.shark.collide_widget(self.obstacle):
+        if self.shark.collide_widget(self.top_pipe) or self.shark.collide_widget(self.bottom_pipe):
             self.end_game()#เรียกฟังก์ชันจบเกมชนobject
 
-        if self.obstacle.x < -50:
+        if self.top_pipe.x < -50:
             self.score += 1
-            self.obstacle.x = self.width
+            self.reset_pipes()
             if self.score % 50 == 0:
                 print("Harder!!!")
 
@@ -59,10 +62,25 @@ class SharkyGoGame(Widget):
             self.collision_sound.play()
         Clock.unschedule(self.update)
 
+    def reset_pipes(self):
+        gap = 180 #ระยะห่างท่อ
+        min_height = 50
+        max_height = self.height - gap - min_height
+        
+        pipe_height = random.randint(min_height, max_height)
+
+        self.top_pipe.x = self.width
+        self.bottom_pipe.y = 0 #ท่อบน
+        self.bottom_pipe.height = pipe_height
+
+        self.bottom_pipe.x = self.width
+        self.top_pipe.y = pipe_height + gap
+        self.top_pipe.height = self.height - (pipe_height + gap) #ท่อล่าง
+
 class Shark(Widget):
     velocity = ReferenceListProperty(NumericProperty(0), NumericProperty(0))
     gravity = -0.3
-    jump_force = 7.2
+    jump_force = 7
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -94,8 +112,9 @@ class Shark(Widget):
         self.jump_sound = SoundLoader.load('assets/sounds/hitcute.mp3')
         self.jump_sound.play()
 
-class Obstacle(Widget):
+class Pipe(Widget):
     velocity_x = NumericProperty(-5)
+
     def move(self):
         self.x += self.velocity_x
 
