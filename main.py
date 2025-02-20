@@ -101,7 +101,7 @@ class Shark(Widget):
         #ล็อกจุด
         if self.start_x == 0:
             self.start_x = self.x
-        self.x = self.start_x  
+            self.x = self.start_x  
 
         #กันหลุกขอบ
         if self.y < 0:
