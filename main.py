@@ -1,6 +1,6 @@
 from kivy.app import App
 from kivy.uix.widget import Widget, ObjectProperty
-from kivy.properties import NumericProperty, ReferenceListProperty
+from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty, BooleanProperty
 from kivy.vector import Vector
 from kivy.core.audio import SoundLoader
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -25,6 +25,7 @@ class SharkyGoGame(Widget):
     top_pipe = ObjectProperty(None)
     bottom_pipe = ObjectProperty(None)
     score = NumericProperty(0)
+    pipe_passed = BooleanProperty(False)
     game_over = False #จนกว่าจะจบ
 
     def __init__(self, **kwargs):
@@ -45,8 +46,11 @@ class SharkyGoGame(Widget):
         if self.shark.collide_widget(self.top_pipe) or self.shark.collide_widget(self.bottom_pipe):
             self.end_game()#เรียกฟังก์ชันจบเกมชนobject
 
-        if self.top_pipe.x < -50:
+        if not self.pipe_passed and self.shark.x > self.top_pipe.x + self.top_pipe.width:
             self.score += 1
+            self.pipe_passed = True#ป้องกันนับซ้ำหลังผ่านท่อ
+
+        if self.top_pipe.x < -50:
             self.reset_pipes()
             if self.score % 50 == 0:
                 print("Harder!!!")
@@ -76,6 +80,8 @@ class SharkyGoGame(Widget):
         self.bottom_pipe.x = self.width
         self.top_pipe.y = pipe_height + gap
         self.top_pipe.height = self.height - (pipe_height + gap) #ท่อล่าง
+
+        self.pipe_passed = False#reset คะแนน
 
 class Shark(Widget):
     velocity = ReferenceListProperty(NumericProperty(0), NumericProperty(0))
@@ -109,7 +115,7 @@ class Shark(Widget):
 
     def jump(self):
         self.velocity = Vector(0, self.jump_force)
-        self.jump_sound = SoundLoader.load('assets/sounds/hitcute.mp3')
+        self.jump_sound = SoundLoader.load('assets/sounds/.mp3')
         self.jump_sound.play()
 
 class Pipe(Widget):
