@@ -115,7 +115,7 @@ class Shark(Widget):
 
     def jump(self):
         self.velocity = Vector(0, self.jump_force)
-        self.jump_sound = SoundLoader.load('assets/sounds/.mp3')
+        self.jump_sound = SoundLoader.load('assets/sounds/jump.mp3')
         self.jump_sound.play()
 
 class Pipe(Widget):
