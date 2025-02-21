@@ -1,3 +1,4 @@
+#sharkygo.kv
 <MenuScreen>:
     BoxLayout:
         orientation: 'vertical'
@@ -37,11 +38,14 @@
         size: 70, 300
         pos: root.width, 0
 
-    Label:
-        text: str(root.score)
-        pos: root.width - 100, root.height - 50
-        font_size: 30
-        color: 1, 1, 1, 1
+    FloatLayout:
+        size: root.size
+        Label:
+            text: str(root.score)
+            font_size: 50
+            bold: True
+            color: 1, 1, 1, 1
+            pos_hint: {"center_x": 0.5, "top": 1.4}
 
 <Shark>:
     size: 50, 50

@@ -1,3 +1,4 @@
+#main.py
 from kivy.app import App
 from kivy.uix.widget import Widget, ObjectProperty
 from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty, BooleanProperty
@@ -41,14 +42,14 @@ class SharkyGoGame(Widget):
         self.bottom_pipe.move()
 
         if self.shark.y <= 0 or self.shark.top >= self.height:
-            self.end_game()#เรียกฟังก์ชันจบเกมตอนชนบนล่าง
+            self.end_game() #เรียกฟังก์ชันจบเกมตอนชนบนล่าง
 
         if self.shark.collide_widget(self.top_pipe) or self.shark.collide_widget(self.bottom_pipe):
-            self.end_game()#เรียกฟังก์ชันจบเกมชนobject
+            self.end_game() #เรียกฟังก์ชันจบเกมชนobject
 
         if not self.pipe_passed and self.shark.x > self.top_pipe.x + self.top_pipe.width:
             self.score += 1
-            self.pipe_passed = True#ป้องกันนับซ้ำหลังผ่านท่อ
+            self.pipe_passed = True #ป้องกันนับซ้ำหลังผ่านท่อ
 
         if self.top_pipe.x < -50:
             self.reset_pipes()
@@ -64,10 +65,10 @@ class SharkyGoGame(Widget):
     def restart_game(self):
         self.score = 0
         self.game_over = False
-        self.shark.y = self.height / 2  # Reset shark position
-        self.shark.velocity = Vector(0, 0)  # Reset velocity
+        self.shark.y = self.height / 2 #รีน้องฉลาม
+        self.shark.velocity = Vector(0, 0)  #รีความเร็ว
         self.reset_pipes()
-        Clock.schedule_interval(self.update, 1.0 / 60.0)  # Resume the game loop
+        Clock.schedule_interval(self.update, 1.0 / 60.0)  #ทำให้เกมเริ่มใหม่
 
 
     def end_game(self):
