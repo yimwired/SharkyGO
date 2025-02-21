@@ -38,15 +38,14 @@
         size: 70, 300
         pos: root.width, 0
 
-    Label:
-        text: str(root.score)
-        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        # Center the label both horizontally and vertically
-        size_hint: None, None
-        # Fixed size
-        size: 200, 100  # Define the size of the label
-        font_size: 70
-        color: 1, 1, 1, 1  # White color
+    FloatLayout:
+        size: root.size
+        Label:
+            text: str(root.score)
+            font_size: 50
+            bold: True
+            color: 1, 1, 1, 1
+            pos_hint: {"center_x": 0.5, "top": 1.4}
 
 <Shark>:
     size: 50, 50
