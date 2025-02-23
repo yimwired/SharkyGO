@@ -18,11 +18,10 @@
     bottom_pipe: bottom_pipe
     score: root.score
     canvas:
-        Color:
-            rgb: 0.2, 0.6, 1
         Rectangle:
             pos: self.pos
             size: self.size
+            source: 'assets/images/background.png'
 
     Shark:
         id: shark
@@ -48,7 +47,7 @@
 
 <Shark>:
     size_hint: None, None
-    size: 100, 70
+    size: 70, 50
     canvas:
         Rectangle:
             pos: self.pos
