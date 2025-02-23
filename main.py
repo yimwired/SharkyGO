@@ -96,7 +96,7 @@ class SharkyGoGame(Widget):
 
         self.pipe_passed = False  # reset คะแนน
 
-class Shark(Widget):
+class Shark(Image):
     velocity = ReferenceListProperty(NumericProperty(0), NumericProperty(0))
     gravity = -0.3
     jump_force = 7
