@@ -1,6 +1,7 @@
 #main.py
 from kivy.app import App
 from kivy.uix.widget import Widget, ObjectProperty
+from kivy.uix.image import Image
 from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty, BooleanProperty
 from kivy.vector import Vector
 from kivy.core.audio import SoundLoader
@@ -13,9 +14,9 @@ class MenuScreen(Screen):
     def on_enter(self):
         if not hasattr(self, 'background_music'):
             self.background_music = SoundLoader.load('assets/sounds/BackgroundMermaid.mp3')
-            if self.background_music:
-                self.background_music.loop = True
-                self.background_music.play()
+   #         if self.background_music:
+    #            self.background_music.loop = True
+     #           self.background_music.play()
 
 class GameScreen(Screen):
     def on_enter(self):
@@ -137,7 +138,7 @@ class Shark(Widget):
         self.jump_sound.play()
 
 class Pipe(Widget):
-    velocity_x = NumericProperty(-5)
+    velocity_x = NumericProperty(-5)#ความเร็วท่อ
 
     def move(self):
         self.x += self.velocity_x
