@@ -7,7 +7,6 @@ from kivy.vector import Vector
 from kivy.core.audio import SoundLoader
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
-from kivy.uix.image import Image  # Added for displaying the shark image
 import random
 
 class MenuScreen(Screen):
@@ -30,10 +29,18 @@ class SharkyGoGame(Widget):
     score = NumericProperty(0)
     pipe_passed = BooleanProperty(False)
     game_over = False  # จนกว่าจะจบ
+    pipe_speed = NumericProperty(-5)  #ความเร็วท่อ Begin
+    speed_boosted_50 = BooleanProperty(False)
+    speed_boosted_100 = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.collision_sound = SoundLoader.load('assets/sounds/hitcute.mp3')
+        self.background_music = SoundLoader.load('assets/sounds/BackgroundMermaid.mp3')
+        self.Epic_music = SoundLoader.load('assets/sounds/BackgroundEpic.mp3')
+
+        self.background = Image(source='assets/images/background.png', allow_stretch=True, keep_ratio=False)
+        self.add_widget(self.background)
 
     def update(self, dt):
         if self.game_over:
@@ -50,13 +57,28 @@ class SharkyGoGame(Widget):
             self.end_game()  # เรียกฟังก์ชันจบเกมชนobject
 
         if not self.pipe_passed and self.shark.x > self.top_pipe.x + self.top_pipe.width:
-            self.score += 1
+            self.score += 50
             self.pipe_passed = True  # ป้องกันนับซ้ำหลังผ่านท่อ
 
         if self.top_pipe.x < -50:
-            self.reset_pipes()
-            if self.score % 50 == 0:
-                print("Harder!!!")
+            self.reset_pipes() # ท่อหมดจอ
+
+        if self.score >= 50 and not self.speed_boosted_50: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
+            self.pipe_speed -= 2  # ท่อเคลื่อนที่เร็วขึ้น
+            self.background.source = 'assets/images/new_background.png'
+            self.background.reload()
+            self.speed_boosted_50 = True
+            print("Harder!!!")
+
+        if self.score >= 100 and not self.speed_boosted_100: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
+            self.pipe_speed -= 3  # ท่อเร็วขึ้นอีก
+            self.background.source = 'assets/images/new_background2.png'
+            self.background.reload()
+            if self.Epic_music:
+                self.Epic_music.play()
+            self.speed_boosted_100 = True
+            print("God Mode!!!")
+
 
     def on_touch_down(self, touch):
         if self.game_over:
@@ -67,6 +89,16 @@ class SharkyGoGame(Widget):
     def restart_game(self):
         self.score = 0
         self.game_over = False
+        self.pipe_speed = -5 # ความเร็วท่อ Begin
+        self.speed_boosted_50 = False # รีความเร็วท่อ
+        self.speed_boosted_100 = False # รีความเร็วท่อ
+
+        if self.Epic_music:
+            self.Epic_music.stop()
+
+        self.background.source = 'assets/images/background.png'
+        self.background.reload()
+
         self.shark.y = self.height / 2  # รีน้องฉลาม
         self.shark.velocity = Vector(0, 0)  # รีความเร็ว
         self.reset_pipes()
@@ -77,10 +109,12 @@ class SharkyGoGame(Widget):
         print("Game Over!")
         if self.collision_sound:
             self.collision_sound.play()
+        if self.Epic_music:
+            self.Epic_music.stop()
         Clock.unschedule(self.update)
 
     def reset_pipes(self):
-        gap = 180  # ระยะห่างท่อ
+        gap = 200  # ระยะห่างท่อ
         min_height = 50
         max_height = self.height - gap - min_height
 
@@ -95,8 +129,16 @@ class SharkyGoGame(Widget):
         self.top_pipe.height = self.height - (pipe_height + gap)  # ท่อล่าง
 
         self.pipe_passed = False  # reset คะแนน
+        self.top_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
+        self.bottom_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
 
-class Shark(Widget):
+class Pipe(Widget):
+    velocity_x = NumericProperty(-5) # ความเร็วท่อ
+
+    def move(self):
+        self.x += self.velocity_x
+
+class Shark(Image):
     velocity = ReferenceListProperty(NumericProperty(0), NumericProperty(0))
     gravity = -0.3
     jump_force = 7
@@ -105,9 +147,7 @@ class Shark(Widget):
         super().__init__(**kwargs)
         self.velocity = Vector(0, 0)
         self.start_x = 0  # กำหนดจุดเริ่ม
-        # Create an image widget for the shark character
-        self.shark_image = Image(source='assets/images/shark.png', size_hint=(None, None), size=(100, 100))  # Adjust size as needed
-        self.add_widget(self.shark_image)
+        self.source = 'assets/images/shark.png'
 
     def move(self):
         # vector
@@ -129,19 +169,10 @@ class Shark(Widget):
             self.top = self.parent.height
             self.velocity = (0, 0)
 
-        # Update the position of the shark's image to match the widget position
-        self.shark_image.pos = self.pos  # Align image with the widget position
-
     def jump(self):
         self.velocity = Vector(0, self.jump_force)
         self.jump_sound = SoundLoader.load('assets/sounds/jump.mp3')
         self.jump_sound.play()
-
-class Pipe(Widget):
-    velocity_x = NumericProperty(-5)#ความเร็วท่อ
-
-    def move(self):
-        self.x += self.velocity_x
 
 class SharkyGoApp(App):
     def build(self):

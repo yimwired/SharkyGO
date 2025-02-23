@@ -18,17 +18,14 @@
     bottom_pipe: bottom_pipe
     score: root.score
     canvas:
-        Color:
-            rgb: 0.2, 0.6, 1
         Rectangle:
             pos: self.pos
             size: self.size
+            source: 'assets/images/background.png'
 
     Shark:
         id: shark
         pos: root.width / 4, root.height / 2
-        size_hint: None, None
-        size: 100, 70  # Match the size from main.py
 
     Pipe:
         id: top_pipe
@@ -49,13 +46,13 @@
             pos_hint: {"center_x": 0.5, "top": 1.4}
 
 <Shark>:
-    size: 50, 50  # Image size
+    size_hint: None, None
+    size: 70, 50
     canvas:
-        Color:
-            rgba: (1, 0, 0, 0.5)  # Semi-transparent red for hitbox debugging
         Rectangle:
-            pos: [self.pos[0] + (self.size[0] * 0.25), self.pos[1] + (self.size[1] * 0.25)]  # Position adjusted to center the hitbox
-            size: 50, 50  # Smaller hitbox size
+            pos: self.pos
+            size: self.size
+            source: 'assets/images/shark.png'
 
 <Pipe>:
     canvas:
