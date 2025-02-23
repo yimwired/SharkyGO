@@ -6,6 +6,7 @@ from kivy.vector import Vector
 from kivy.core.audio import SoundLoader
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
+from kivy.uix.image import Image  # Added for displaying the shark image
 import random
 
 class MenuScreen(Screen):
@@ -27,7 +28,7 @@ class SharkyGoGame(Widget):
     bottom_pipe = ObjectProperty(None)
     score = NumericProperty(0)
     pipe_passed = BooleanProperty(False)
-    game_over = False #จนกว่าจะจบ
+    game_over = False  # จนกว่าจะจบ
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -35,21 +36,21 @@ class SharkyGoGame(Widget):
 
     def update(self, dt):
         if self.game_over:
-            return #จบแล้วพอ อย่ายื้อ เอื้อ เจ็บ
+            return  # จบแล้วพอ อย่ายื้อ เอื้อ เจ็บ
 
         self.shark.move()
         self.top_pipe.move()
         self.bottom_pipe.move()
 
         if self.shark.y <= 0 or self.shark.top >= self.height:
-            self.end_game() #เรียกฟังก์ชันจบเกมตอนชนบนล่าง
+            self.end_game()  # เรียกฟังก์ชันจบเกมตอนชนบนล่าง
 
         if self.shark.collide_widget(self.top_pipe) or self.shark.collide_widget(self.bottom_pipe):
-            self.end_game() #เรียกฟังก์ชันจบเกมชนobject
+            self.end_game()  # เรียกฟังก์ชันจบเกมชนobject
 
         if not self.pipe_passed and self.shark.x > self.top_pipe.x + self.top_pipe.width:
             self.score += 1
-            self.pipe_passed = True #ป้องกันนับซ้ำหลังผ่านท่อ
+            self.pipe_passed = True  # ป้องกันนับซ้ำหลังผ่านท่อ
 
         if self.top_pipe.x < -50:
             self.reset_pipes()
@@ -65,11 +66,10 @@ class SharkyGoGame(Widget):
     def restart_game(self):
         self.score = 0
         self.game_over = False
-        self.shark.y = self.height / 2 #รีน้องฉลาม
-        self.shark.velocity = Vector(0, 0)  #รีความเร็ว
+        self.shark.y = self.height / 2  # รีน้องฉลาม
+        self.shark.velocity = Vector(0, 0)  # รีความเร็ว
         self.reset_pipes()
-        Clock.schedule_interval(self.update, 1.0 / 60.0)  #ทำให้เกมเริ่มใหม่
-
+        Clock.schedule_interval(self.update, 1.0 / 60.0)  # ทำให้เกมเริ่มใหม่
 
     def end_game(self):
         self.game_over = True
@@ -79,21 +79,21 @@ class SharkyGoGame(Widget):
         Clock.unschedule(self.update)
 
     def reset_pipes(self):
-        gap = 180 #ระยะห่างท่อ
+        gap = 180  # ระยะห่างท่อ
         min_height = 50
         max_height = self.height - gap - min_height
-        
+
         pipe_height = random.randint(min_height, max_height)
 
         self.top_pipe.x = self.width
-        self.bottom_pipe.y = 0 #ท่อบน
+        self.bottom_pipe.y = 0  # ท่อบน
         self.bottom_pipe.height = pipe_height
 
         self.bottom_pipe.x = self.width
         self.top_pipe.y = pipe_height + gap
-        self.top_pipe.height = self.height - (pipe_height + gap) #ท่อล่าง
+        self.top_pipe.height = self.height - (pipe_height + gap)  # ท่อล่าง
 
-        self.pipe_passed = False#reset คะแนน
+        self.pipe_passed = False  # reset คะแนน
 
 class Shark(Widget):
     velocity = ReferenceListProperty(NumericProperty(0), NumericProperty(0))
@@ -103,27 +103,33 @@ class Shark(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.velocity = Vector(0, 0)
-        self.start_x = 0 #กำหนดจุดเริ่ม
+        self.start_x = 0  # กำหนดจุดเริ่ม
+        # Create an image widget for the shark character
+        self.shark_image = Image(source='assets/images/shark.png', size_hint=(None, None), size=(100, 100))  # Adjust size as needed
+        self.add_widget(self.shark_image)
 
     def move(self):
-        #vector
+        # vector
         self.velocity = Vector(self.velocity[0], self.velocity[1] + self.gravity)
         self.y += self.velocity[1]
 
-        #ล็อกจุด
+        # ล็อกจุด
         if self.start_x == 0:
             self.start_x = self.x
             self.x = self.start_x  
 
-        #กันหลุกขอบ
+        # กันหลุกขอบ
         if self.y < 0:
             self.y = 0
             self.velocity = (0, 0)
 
-        #กันขอบบน
+        # กันขอบบน
         if self.top > self.parent.height:
             self.top = self.parent.height
             self.velocity = (0, 0)
+
+        # Update the position of the shark's image to match the widget position
+        self.shark_image.pos = self.pos  # Align image with the widget position
 
     def jump(self):
         self.velocity = Vector(0, self.jump_force)
