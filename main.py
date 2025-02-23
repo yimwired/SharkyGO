@@ -80,7 +80,7 @@ class SharkyGoGame(Widget):
         Clock.unschedule(self.update)
 
     def reset_pipes(self):
-        gap = 180  # ระยะห่างท่อ
+        gap = 200  # ระยะห่างท่อ
         min_height = 50
         max_height = self.height - gap - min_height
 
@@ -96,7 +96,7 @@ class SharkyGoGame(Widget):
 
         self.pipe_passed = False  # reset คะแนน
 
-class Shark(Widget):
+class Shark(Image):
     velocity = ReferenceListProperty(NumericProperty(0), NumericProperty(0))
     gravity = -0.3
     jump_force = 7
@@ -105,9 +105,7 @@ class Shark(Widget):
         super().__init__(**kwargs)
         self.velocity = Vector(0, 0)
         self.start_x = 0  # กำหนดจุดเริ่ม
-        # Create an image widget for the shark character
-        self.shark_image = Image(source='assets/images/shark.png', size_hint=(None, None), size=(100, 100))  # Adjust size as needed
-        self.add_widget(self.shark_image)
+        self.source = 'assets/images/shark.png'
 
     def move(self):
         # vector
@@ -129,16 +127,13 @@ class Shark(Widget):
             self.top = self.parent.height
             self.velocity = (0, 0)
 
-        # Update the position of the shark's image to match the widget position
-        self.shark_image.pos = self.pos  # Align image with the widget position
-
     def jump(self):
         self.velocity = Vector(0, self.jump_force)
         self.jump_sound = SoundLoader.load('assets/sounds/jump.mp3')
         self.jump_sound.play()
 
 class Pipe(Widget):
-    velocity_x = NumericProperty(-5)#ความเร็วท่อ
+    velocity_x = NumericProperty(-5) #ความเร็วท่อ
 
     def move(self):
         self.x += self.velocity_x
