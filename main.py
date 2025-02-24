@@ -57,7 +57,7 @@ class SharkyGoGame(Widget):
             self.end_game()  # เรียกฟังก์ชันจบเกมชนobject
 
         if not self.pipe_passed and self.shark.x > self.top_pipe.x + self.top_pipe.width:
-            self.score += 1
+            self.score += 50
             self.pipe_passed = True  # ป้องกันนับซ้ำหลังผ่านท่อ
 
         if self.top_pipe.x < -50:
@@ -65,20 +65,21 @@ class SharkyGoGame(Widget):
 
         if self.score >= 50 and not self.speed_boosted_50: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
             self.pipe_speed -= 2  # ท่อเคลื่อนที่เร็วขึ้น
-            self.background.source = 'assets/images/new_background.png'
-            self.background.reload()
+            self.change_background('assets/images/new_background.png')
             self.speed_boosted_50 = True
             print("Harder!!!")
 
         if self.score >= 100 and not self.speed_boosted_100: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
-            self.pipe_speed -= 3  # ท่อเร็วขึ้นอีก
-            self.background.source = 'assets/images/new_background2.png'
-            self.background.reload()
+            self.pipe_speed -= 2.5  # ท่อเร็วขึ้นอีก
+            self.change_background('assets/images/new_background2.png')
             if self.Epic_music:
                 self.Epic_music.play()
             self.speed_boosted_100 = True
             print("God Mode!!!")
 
+    def change_background(self, new_background):
+        self.background.source = new_background
+        self.background.reload()
 
     def on_touch_down(self, touch):
         if self.game_over:
@@ -96,8 +97,7 @@ class SharkyGoGame(Widget):
         if self.Epic_music:
             self.Epic_music.stop()
 
-        self.background.source = 'assets/images/background.png'
-        self.background.reload()
+        self.change_background('assets/images/background.png')
 
         self.shark.y = self.height / 2  # รีน้องฉลาม
         self.shark.velocity = Vector(0, 0)  # รีความเร็ว
