@@ -104,6 +104,10 @@ class SharkyGoGame(Widget):
         self.reset_pipes()
         Clock.schedule_interval(self.update, 1.0 / 60.0)  # ทำให้เกมเริ่มใหม่
 
+        gameover = self.ids.gameover
+        gameover.opacity = 0
+        gameover.disabled = True
+
     def end_game(self):
         self.game_over = True
         print("Game Over!")
@@ -112,6 +116,10 @@ class SharkyGoGame(Widget):
         if self.Epic_music:
             self.Epic_music.stop()
         Clock.unschedule(self.update)
+
+        gameover = self.ids.gameover
+        gameover.opacity = 1
+        gameover.disabled = False
 
     def reset_pipes(self):
         gap = 200  # ระยะห่างท่อ
