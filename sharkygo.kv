@@ -1,12 +1,50 @@
+#sharkygo.kv
 <MenuScreen>:
     BoxLayout:
         orientation: 'vertical'
+        padding: 50
+        spacing: 20
+
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'assets/images/new_background.png'
+
+        Label:
+            text: 'SharkyGo'
+            font_size: 60
+            bold: True
+            color: 1, 1, 1, 1
+            size_hint_y: None
+            height: 100
+
         Button:
             text: 'Start Game'
+            font_size: 30
+            bold: True
+            background_color: 0.1, 0.5, 0.7, 1
+            color: 1, 1, 1, 1
+            size_hint_y: None
+            height: 80
             on_press: root.manager.current = 'game'
+
         Button:
             text: 'Quit'
+            font_size: 30
+            bold: True
+            background_color: 0.8, 0.2, 0.2, 1
+            color: 1, 1, 1, 1
+            size_hint_y: None
+            height: 80
             on_press: app.stop()
+
+        Label:
+            text: 'Created by Your Name'
+            font_size: 20
+            color: 1, 1, 1, 1
+            size_hint_y: None
+            height: 50
 
 <GameScreen>:
     SharkyGoGame:
@@ -48,11 +86,6 @@
 <Shark>:
     size_hint: None, None
     size: 70, 50
-    canvas:
-        Rectangle:
-            pos: self.pos
-            size: self.size
-            source: 'assets/images/shark.png'
 
 <Pipe>:
     canvas:
