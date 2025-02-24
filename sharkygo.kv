@@ -1,12 +1,49 @@
 <MenuScreen>:
     BoxLayout:
         orientation: 'vertical'
+        padding: 50  # ระยะห่างจากขอบ
+        spacing: 20  # ระยะห่างระหว่างวิดเจ็ต
+        canvas.before:
+            Color:
+                rgb: 0.2, 0.6, 0.8 
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: 'SharkyGo'
+            font_size: 60
+            bold: True
+            color: 1, 1, 1, 1  # สีขาว
+            size_hint_y: None
+            height: 100
+
         Button:
             text: 'Start Game'
+            font_size: 30
+            bold: True
+            background_color: 0.1, 0.5, 0.7, 1
+            color: 1, 1, 1, 1
+            size_hint_y: None
+            height: 80
             on_press: root.manager.current = 'game'
+
         Button:
             text: 'Quit'
+            font_size: 30
+            bold: True
+            background_color: 0.8, 0.2, 0.2, 1
+            color: 1, 1, 1, 1 
+            size_hint_y: None
+            height: 80
             on_press: app.stop()
+
+        Label:
+            text: 'Created by สุดเทพ'
+            font_size: 20
+            color: 1, 1, 1, 1
+            size_hint_y: None
+            height: 50
 
 <GameScreen>:
     SharkyGoGame:

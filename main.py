@@ -77,7 +77,7 @@ class SharkyGoGame(Widget):
             self.speed_boosted_100 = True
             print("God Mode!!!")
 
-    def change_background(self, new_background):
+    def change_background(self, new_background): # ฟังก์ชันเปลี่ยนพื้นหลัง
         self.background.source = new_background
         self.background.reload()
 
