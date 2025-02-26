@@ -2,8 +2,8 @@
 <MenuScreen>:
     BoxLayout:
         orientation: 'vertical'
-        padding: 50
-        spacing: 20
+        padding: 40
+        spacing: 15
 
         canvas.before:
             Rectangle:
@@ -13,35 +13,41 @@
 
         Label:
             text: 'SharkyGo'
-            font_size: 60
+            font_size: 70
             bold: True
+            font_name: 'assets/fonts/Pixellettersfull-BnJ5.ttf'
             color: 1, 1, 1, 1
             size_hint_y: None
-            height: 100
+            height: 120
 
         Button:
-            text: 'Start Game'
-            font_size: 30
+            text: 'START GAME'
+            font_size: 32
             bold: True
-            background_color: 0.1, 0.5, 0.7, 1
+            font_name: 'assets/fonts/Pixellettersfull-BnJ5.ttf'
+            background_normal: ''
+            background_color: 0.2, 0.7, 0.2, 1
             color: 1, 1, 1, 1
             size_hint_y: None
-            height: 80
+            height: 90
             on_press: root.manager.current = 'game'
 
         Button:
-            text: 'Quit'
-            font_size: 30
+            text: 'QUIT'
+            font_size: 32
             bold: True
-            background_color: 0.8, 0.2, 0.2, 1
+            font_name: 'assets/fonts/Pixellettersfull-BnJ5.ttf'
+            background_normal: ''
+            background_color: 0.7, 0.2, 0.2, 1
             color: 1, 1, 1, 1
             size_hint_y: None
-            height: 80
+            height: 90
             on_press: app.stop()
 
         Label:
             text: 'Created by Your Name'
-            font_size: 20
+            font_size: 22
+            font_name: 'assets/fonts/Pixellettersfull-BnJ5.ttf'
             color: 1, 1, 1, 1
             size_hint_y: None
             height: 50
@@ -90,7 +96,7 @@
             disabled: True
             size_hint: None, None
             size: 300, 100
-            pos_hint: {"center_x": 0.5, "center_y": 0.6}
+            pos_hint: {"center_x": 0.5, "center_y": 0.7}
 
 <Shark>:
     size_hint: None, None
