@@ -62,7 +62,7 @@ class SharkyGoGame(Widget):
             self.end_game()  # เรียกฟังก์ชันจบเกมชนobject
 
         if not self.pipe_passed and self.shark.x > self.top_pipe.x + self.top_pipe.width:
-            self.score += 50
+            self.score += 1
             self.pipe_passed = True  # ป้องกันนับซ้ำหลังผ่านท่อ
 
         if self.top_pipe.x < -50:
@@ -145,8 +145,14 @@ class SharkyGoGame(Widget):
         self.top_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
         self.bottom_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
 
-class Pipe(Widget):
+class Pipe(Image):
     velocity_x = NumericProperty(-5) # ความเร็วท่อ
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.source = 'assets/images/kelp.png'  # Pipe sprite
+        self.allow_stretch = True
+        self.keep_ratio = False
 
     def move(self):
         self.x += self.velocity_x
