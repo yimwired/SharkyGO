@@ -62,7 +62,7 @@ class SharkyGoGame(Widget):
             self.end_game()  # เรียกฟังก์ชันจบเกมชนobject
 
         if not self.pipe_passed and self.shark.x > self.top_pipe.x + self.top_pipe.width:
-            self.score += 50
+            self.score += 1
             self.pipe_passed = True  # ป้องกันนับซ้ำหลังผ่านท่อ
 
         if self.top_pipe.x < -50:
