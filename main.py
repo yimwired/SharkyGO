@@ -12,7 +12,6 @@ import random
 
 class MenuScreen(Screen):
     def on_enter(self):
-        # Get screen size
         screen_width = Window.width
         screen_height = Window.height
         print(f"Screen Width: {screen_width}, Screen Height: {screen_height}")
