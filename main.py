@@ -172,7 +172,7 @@ class Shark(Image):
             self.start_x = self.x
             self.x = self.start_x  
 
-        # กันหลุกขอบ
+        # กันหลุดขอบ
         if self.y < 0:
             self.y = 0
             self.velocity = (0, 0)
