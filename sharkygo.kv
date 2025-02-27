@@ -73,11 +73,16 @@
 
     Pipe:
         id: top_pipe
-        size: 70, 300
+        size: 100, 400
+        size_hint: None, None
         pos: root.width, root.height - 300
+        angle: 180
+        origin: self.center
+
     Pipe:
         id: bottom_pipe
-        size: 70, 300
+        size: 100, 400
+        size_hint: None, None
         pos: root.width, 0
 
     FloatLayout:
@@ -103,6 +108,5 @@
     size: 70, 50
 
 <Pipe>:
-    source: 'assets/images/kelp.png'  # Change to your actual pipe image
     allow_stretch: True
     keep_ratio: False

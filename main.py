@@ -150,7 +150,7 @@ class Pipe(Image):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.source = 'assets/images/kelp.png'  # Pipe sprite
+        self.source = 'assets/images/kelp.png'
         self.allow_stretch = True
         self.keep_ratio = False
 
