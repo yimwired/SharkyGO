@@ -40,6 +40,7 @@ class SharkyGoGame(Widget):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        Window.bind(on_key_down=self.on_key_down)
         self.collision_sound = SoundLoader.load('assets/sounds/hitcute.mp3')
         self.background_music = SoundLoader.load('assets/sounds/BackgroundMermaid.mp3')
         self.Epic_music = SoundLoader.load('assets/sounds/BackgroundEpic.mp3')
@@ -47,6 +48,12 @@ class SharkyGoGame(Widget):
         self.background = Image(source='assets/images/background.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(self.background)
 
+    def on_key_down(self, window, key, *args):
+        if key == 32:  # Spacebar key
+            if self.game_over:
+                self.restart_game()
+            else:
+                self.shark.jump()
     def update(self, dt):
         if self.game_over:
             return  # จบแล้วพอ อย่ายื้อ เอื้อ เจ็บ
