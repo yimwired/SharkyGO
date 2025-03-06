@@ -32,6 +32,23 @@
             height: 90
             on_press: root.manager.current = 'game'
 
+        Label:
+            text: 'Volume'
+            font_size: 24
+            font_name: 'assets/fonts/Pixellettersfull-BnJ5.ttf'
+            color: 1, 1, 1, 1
+            size_hint_y: None
+            height: 40
+
+        Slider:
+            id: volume_slider
+            min: 0
+            max: 1
+            value: root.volume
+            size_hint_y: None
+            height: 50
+            on_value: root.adjust_volume(self.value)
+
         Button:
             text: 'QUIT'
             font_size: 32
