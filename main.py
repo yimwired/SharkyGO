@@ -140,15 +140,15 @@ class SharkyGoGame(Widget):
 
     def reset_pipes(self):
         # Calculate the gap size, ensuring it doesn't get too small
-        gap = random.randint(100, 200)  # Random gap between pipes
-        min_height = 50
-        max_height = self.height - gap - min_height
+        gap = random.randint(50, 100)  # Random gap between pipes
+        min_height = 50  # Minimum height for pipes
+        max_height = self.height - gap - min_height  # Maximum height based on screen height and gap
 
-        # Randomize pipe height
+        # Randomize pipe height, ensuring the pipe is within valid height range
         pipe_height = random.randint(min_height, max_height)
-        pipe_width = 60  # Constant pipe width
+        pipe_width = 60  # Set the pipe width to a constant value (e.g., 60 pixels)
 
-        # Change pipe images based on the level
+        # Set pipe images based on the level
         if self.level == 3:
             self.top_pipe.source = 'assets/images/rock.png'
             self.bottom_pipe.source = 'assets/images/rock.png'
@@ -159,14 +159,13 @@ class SharkyGoGame(Widget):
             self.top_pipe.source = 'assets/images/kelp.png'
             self.bottom_pipe.source = 'assets/images/kelp.png'
 
-
         # Position and adjust pipe size
         self.top_pipe.x = self.width  # Place top pipe at the right edge of the screen
-        self.top_pipe.width = pipe_width
-        self.top_pipe.height = self.height - (pipe_height + gap)  # Top pipe is above the gap
+        self.top_pipe.width = pipe_width  # Set pipe width
+        self.top_pipe.height = self.height - (pipe_height + gap)  # Top pipe height adjusted based on random height and gap
 
         self.bottom_pipe.x = self.width  # Place bottom pipe at the right edge of the screen
-        self.bottom_pipe.width = pipe_width
+        self.bottom_pipe.width = pipe_width  # Set pipe width
         self.bottom_pipe.height = pipe_height  # Bottom pipe height is randomized
 
         self.bottom_pipe.y = pipe_height + gap  # Place bottom pipe below the gap
