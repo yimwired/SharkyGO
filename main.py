@@ -37,8 +37,7 @@ class SharkyGoGame(Widget):
     pipe_passed = BooleanProperty(False)
     game_over = False  # จนกว่าจะจบ
     pipe_speed = NumericProperty(-5)  #ความเร็วท่อ Begin
-    speed_boosted_50 = BooleanProperty(False)
-    speed_boosted_100 = BooleanProperty(False)
+    level = NumericProperty(1)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -53,15 +52,6 @@ class SharkyGoGame(Widget):
             self.background_music.volume = self.volume
             self.background_music.play()
 
-        def adjust_volume(self, value):
-            self.volume = value
-            if self.background_music:
-                self.background_music.volume = value
-            if self.Epic_music:
-                self.Epic_music.volume = value
-            if self.collision_sound:
-                self.collision_sound.volume = value
-
         self.background = Image(source='assets/images/background.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(self.background)
 
@@ -71,6 +61,7 @@ class SharkyGoGame(Widget):
                 self.restart_game()
             else:
                 self.shark.jump()
+    
     def update(self, dt):
         if self.game_over:
             return  # จบแล้วพอ อย่ายื้อ เอื้อ เจ็บ
@@ -92,19 +83,15 @@ class SharkyGoGame(Widget):
         if self.top_pipe.x < -50:
             self.reset_pipes() # ท่อหมดจอ
 
-        if self.score >= 50 and not self.speed_boosted_50: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
-            self.pipe_speed -= 2  # ท่อเคลื่อนที่เร็วขึ้น
-            self.change_background('assets/images/new_background.png')
-            self.speed_boosted_50 = True
-            print("Harder!!!")
-
-        if self.score >= 100 and not self.speed_boosted_100: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
-            self.pipe_speed -= 2.5  # ท่อเร็วขึ้นอีก
-            self.change_background('assets/images/new_background2.png')
-            if self.Epic_music:
+        # เพิ่มระดับทุก ๆ 20 คะแนน
+        new_level = (self.score // 20) + 1
+        if new_level > self.level:
+            self.level = new_level
+            self.pipe_speed -= 1.5  # เพิ่มความเร็ว
+            self.change_background(f'assets/images/new_background{min(self.level, 3)}.png')
+            print(f"Level Up! Now Level {self.level}")
+            if self.level >= 6 and self.Epic_music:
                 self.Epic_music.play()
-            self.speed_boosted_100 = True
-            print("God Mode!!!")
 
     def change_background(self, new_background): # ฟังก์ชันเปลี่ยนพื้นหลัง
         self.background.source = new_background
@@ -120,8 +107,7 @@ class SharkyGoGame(Widget):
         self.score = 0
         self.game_over = False
         self.pipe_speed = -5 # ความเร็วท่อ Begin
-        self.speed_boosted_50 = False # รีความเร็วท่อ
-        self.speed_boosted_100 = False # รีความเร็วท่อ
+        self.level = 1 # รีระดับ
 
         if self.Epic_music:
             self.Epic_music.stop()
@@ -194,24 +180,8 @@ class Shark(Image):
         self.source = 'assets/images/shark.png'
 
     def move(self):
-        # vector
         self.velocity = Vector(self.velocity[0], self.velocity[1] + self.gravity)
         self.y += self.velocity[1]
-
-        # ล็อกจุด
-        if self.start_x == 0:
-            self.start_x = self.x
-            self.x = self.start_x  
-
-        # กันหลุดขอบ
-        if self.y < 0:
-            self.y = 0
-            self.velocity = (0, 0)
-
-        # กันขอบบน
-        if self.top > self.parent.height:
-            self.top = self.parent.height
-            self.velocity = (0, 0)
 
     def jump(self):
         self.velocity = Vector(0, self.jump_force)
