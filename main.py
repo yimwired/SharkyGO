@@ -83,7 +83,7 @@ class SharkyGoGame(Widget):
         if self.top_pipe.x < -50:
             self.reset_pipes() # ท่อหมดจอ
 
-        # เพิ่มระดับทุก ๆ 20 คะแนน
+        # เพิ่มระดับทุก ๆ 15 คะแนน
         new_level = (self.score // 15) + 1
         if new_level > self.level:
             self.level = new_level
