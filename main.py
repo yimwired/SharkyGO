@@ -84,7 +84,7 @@ class SharkyGoGame(Widget):
             self.reset_pipes() # ท่อหมดจอ
 
         # เพิ่มระดับทุก ๆ 20 คะแนน
-        new_level = (self.score // 20) + 1
+        new_level = (self.score // 5) + 1
         if new_level > self.level:
             self.level = new_level
             self.pipe_speed -= 1.5  # เพิ่มความเร็ว
@@ -93,7 +93,8 @@ class SharkyGoGame(Widget):
             if self.level >= 6 and self.Epic_music:
                 self.Epic_music.play()
 
-    def change_background(self, new_background): # ฟังก์ชันเปลี่ยนพื้นหลัง
+    # Reverted and added level-dependent background change
+    def change_background(self, new_background):  # ฟังก์ชันเปลี่ยนพื้นหลัง
         self.background.source = new_background
         self.background.reload()
 
@@ -138,23 +139,42 @@ class SharkyGoGame(Widget):
         gameover.disabled = False
 
     def reset_pipes(self):
-        gap = 150  # ระยะห่างท่อ
+        # Calculate the gap size, ensuring it doesn't get too small
+        gap = random.randint(100, 200)  # Random gap between pipes
         min_height = 50
         max_height = self.height - gap - min_height
 
+        # Randomize pipe height
         pipe_height = random.randint(min_height, max_height)
+        pipe_width = 60  # Constant pipe width
 
-        self.top_pipe.x = self.width
-        self.bottom_pipe.y = 0  # ท่อบน
-        self.bottom_pipe.height = pipe_height
+        # Change pipe images based on the level
+        if self.level == 3:
+            self.top_pipe.source = 'assets/images/rock.png'
+            self.bottom_pipe.source = 'assets/images/rock.png'
+        elif self.level == 2:
+            self.top_pipe.source = 'assets/images/ice.png'
+            self.bottom_pipe.source = 'assets/images/ice.png'
+        else:
+            self.top_pipe.source = 'assets/images/kelp.png'
+            self.bottom_pipe.source = 'assets/images/kelp.png'
 
-        self.bottom_pipe.x = self.width
-        self.top_pipe.y = pipe_height + gap
-        self.top_pipe.height = self.height - (pipe_height + gap)  # ท่อล่าง
 
-        self.pipe_passed = False  # reset คะแนน
-        self.top_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
-        self.bottom_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
+        # Position and adjust pipe size
+        self.top_pipe.x = self.width  # Place top pipe at the right edge of the screen
+        self.top_pipe.width = pipe_width
+        self.top_pipe.height = self.height - (pipe_height + gap)  # Top pipe is above the gap
+
+        self.bottom_pipe.x = self.width  # Place bottom pipe at the right edge of the screen
+        self.bottom_pipe.width = pipe_width
+        self.bottom_pipe.height = pipe_height  # Bottom pipe height is randomized
+
+        self.bottom_pipe.y = pipe_height + gap  # Place bottom pipe below the gap
+
+        # Reset pipe passed flag and adjust pipe speeds
+        self.pipe_passed = False
+        self.top_pipe.velocity_x = self.pipe_speed
+        self.bottom_pipe.velocity_x = self.pipe_speed
 
 class Pipe(Image):
     velocity_x = NumericProperty(-5) # ความเร็วท่อ
