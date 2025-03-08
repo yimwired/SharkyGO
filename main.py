@@ -138,7 +138,7 @@ class SharkyGoGame(Widget):
         gameover.disabled = False
 
     def reset_pipes(self):
-        gap = 200  # ระยะห่างท่อ
+        gap = 150  # ระยะห่างท่อ
         min_height = 50
         max_height = self.height - gap - min_height
 
