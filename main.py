@@ -37,7 +37,8 @@ class SharkyGoGame(Widget):
     pipe_passed = BooleanProperty(False)
     game_over = False  # จนกว่าจะจบ
     pipe_speed = NumericProperty(-5)  #ความเร็วท่อ Begin
-    level = NumericProperty(1)
+    speed_boosted_50 = BooleanProperty(False)
+    speed_boosted_100 = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -52,6 +53,15 @@ class SharkyGoGame(Widget):
             self.background_music.volume = self.volume
             self.background_music.play()
 
+        def adjust_volume(self, value):
+            self.volume = value
+            if self.background_music:
+                self.background_music.volume = value
+            if self.Epic_music:
+                self.Epic_music.volume = value
+            if self.collision_sound:
+                self.collision_sound.volume = value
+
         self.background = Image(source='assets/images/background.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(self.background)
 
@@ -61,7 +71,6 @@ class SharkyGoGame(Widget):
                 self.restart_game()
             else:
                 self.shark.jump()
-    
     def update(self, dt):
         if self.game_over:
             return  # จบแล้วพอ อย่ายื้อ เอื้อ เจ็บ
@@ -83,18 +92,21 @@ class SharkyGoGame(Widget):
         if self.top_pipe.x < -50:
             self.reset_pipes() # ท่อหมดจอ
 
-        # เพิ่มระดับทุก ๆ 15 คะแนน
-        new_level = (self.score // 15) + 1
-        if new_level > self.level:
-            self.level = new_level
-            self.pipe_speed -= 1.5  # เพิ่มความเร็ว
-            self.change_background(f'assets/images/new_background{min(self.level, 3)}.png')
-            print(f"Level Up! Now Level {self.level}")
-            if self.level >= 6 and self.Epic_music:
-                self.Epic_music.play()
+        if self.score >= 50 and not self.speed_boosted_50: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
+            self.pipe_speed -= 2  # ท่อเคลื่อนที่เร็วขึ้น
+            self.change_background('assets/images/new_background.png')
+            self.speed_boosted_50 = True
+            print("Harder!!!")
 
-    # Reverted and added level-dependent background change
-    def change_background(self, new_background):  # ฟังก์ชันเปลี่ยนพื้นหลัง
+        if self.score >= 100 and not self.speed_boosted_100: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
+            self.pipe_speed -= 2.5  # ท่อเร็วขึ้นอีก
+            self.change_background('assets/images/new_background2.png')
+            if self.Epic_music:
+                self.Epic_music.play()
+            self.speed_boosted_100 = True
+            print("God Mode!!!")
+
+    def change_background(self, new_background): # ฟังก์ชันเปลี่ยนพื้นหลัง
         self.background.source = new_background
         self.background.reload()
 
@@ -108,7 +120,8 @@ class SharkyGoGame(Widget):
         self.score = 0
         self.game_over = False
         self.pipe_speed = -5 # ความเร็วท่อ Begin
-        self.level = 1 # รีระดับ
+        self.speed_boosted_50 = False # รีความเร็วท่อ
+        self.speed_boosted_100 = False # รีความเร็วท่อ
 
         if self.Epic_music:
             self.Epic_music.stop()
@@ -139,41 +152,23 @@ class SharkyGoGame(Widget):
         gameover.disabled = False
 
     def reset_pipes(self):
-        # Calculate the gap size, ensuring it doesn't get too small
-        gap = random.randint(50, 100)  # Random gap between pipes
-        min_height = 50  # Minimum height for pipes
-        max_height = self.height - gap - min_height  # Maximum height based on screen height and gap
+        gap = 200  # ระยะห่างท่อ
+        min_height = 50
+        max_height = self.height - gap - min_height
 
-        # Randomize pipe height, ensuring the pipe is within valid height range
         pipe_height = random.randint(min_height, max_height)
-        pipe_width = 60  # Set the pipe width to a constant value (e.g., 60 pixels)
 
-        # Set pipe images based on the level
-        if self.level == 3:
-            self.top_pipe.source = 'assets/images/rock.png'
-            self.bottom_pipe.source = 'assets/images/rock.png'
-        elif self.level == 2:
-            self.top_pipe.source = 'assets/images/ice.png'
-            self.bottom_pipe.source = 'assets/images/ice.png'
-        else:
-            self.top_pipe.source = 'assets/images/kelp.png'
-            self.bottom_pipe.source = 'assets/images/kelp.png'
+        self.top_pipe.x = self.width
+        self.bottom_pipe.y = 0  # ท่อบน
+        self.bottom_pipe.height = pipe_height
 
-        # Position and adjust pipe size
-        self.top_pipe.x = self.width  # Place top pipe at the right edge of the screen
-        self.top_pipe.width = pipe_width  # Set pipe width
-        self.top_pipe.height = self.height - (pipe_height + gap)  # Top pipe height adjusted based on random height and gap
+        self.bottom_pipe.x = self.width
+        self.top_pipe.y = pipe_height + gap
+        self.top_pipe.height = self.height - (pipe_height + gap)  # ท่อล่าง
 
-        self.bottom_pipe.x = self.width  # Place bottom pipe at the right edge of the screen
-        self.bottom_pipe.width = pipe_width  # Set pipe width
-        self.bottom_pipe.height = pipe_height  # Bottom pipe height is randomized
-
-        self.bottom_pipe.y = pipe_height + gap  # Place bottom pipe below the gap
-
-        # Reset pipe passed flag and adjust pipe speeds
-        self.pipe_passed = False
-        self.top_pipe.velocity_x = self.pipe_speed
-        self.bottom_pipe.velocity_x = self.pipe_speed
+        self.pipe_passed = False  # reset คะแนน
+        self.top_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
+        self.bottom_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
 
 class Pipe(Image):
     velocity_x = NumericProperty(-5) # ความเร็วท่อ
@@ -199,8 +194,24 @@ class Shark(Image):
         self.source = 'assets/images/shark.png'
 
     def move(self):
+        # vector
         self.velocity = Vector(self.velocity[0], self.velocity[1] + self.gravity)
         self.y += self.velocity[1]
+
+        # ล็อกจุด
+        if self.start_x == 0:
+            self.start_x = self.x
+            self.x = self.start_x  
+
+        # กันหลุดขอบ
+        if self.y < 0:
+            self.y = 0
+            self.velocity = (0, 0)
+
+        # กันขอบบน
+        if self.top > self.parent.height:
+            self.top = self.parent.height
+            self.velocity = (0, 0)
 
     def jump(self):
         self.velocity = Vector(0, self.jump_force)
