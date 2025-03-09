@@ -216,5 +216,3 @@ class SharkyGoApp(App):
 
 if __name__ == '__main__':
     SharkyGoApp().run()
-
-    #-
