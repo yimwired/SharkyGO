@@ -37,8 +37,8 @@ class SharkyGoGame(Widget):
     pipe_passed = BooleanProperty(False)
     game_over = False  # จนกว่าจะจบ
     pipe_speed = NumericProperty(-5)  #ความเร็วท่อ Begin
+    speed_boosted_30 = BooleanProperty(False)
     speed_boosted_50 = BooleanProperty(False)
-    speed_boosted_100 = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -86,24 +86,24 @@ class SharkyGoGame(Widget):
             self.end_game()  # เรียกฟังก์ชันจบเกมชนobject
 
         if not self.pipe_passed and self.shark.x > self.top_pipe.x + self.top_pipe.width:
-            self.score += 1
+            self.score += 30
             self.pipe_passed = True  # ป้องกันนับซ้ำหลังผ่านท่อ
 
         if self.top_pipe.x < -50:
             self.reset_pipes() # ท่อหมดจอ
 
-        if self.score >= 50 and not self.speed_boosted_50: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
+        if self.score >= 30 and not self.speed_boosted_30: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
             self.pipe_speed -= 2  # ท่อเคลื่อนที่เร็วขึ้น
             self.change_background('assets/images/new_background.png')
-            self.speed_boosted_50 = True
+            self.speed_boosted_30 = True
             print("Harder!!!")
 
-        if self.score >= 100 and not self.speed_boosted_100: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
+        if self.score >= 50 and not self.speed_boosted_50: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
             self.pipe_speed -= 2.5  # ท่อเร็วขึ้นอีก
             self.change_background('assets/images/new_background2.png')
             if self.Epic_music:
                 self.Epic_music.play()
-            self.speed_boosted_100 = True
+            self.speed_boosted_50 = True
             print("God Mode!!!")
 
     def change_background(self, new_background): # ฟังก์ชันเปลี่ยนพื้นหลัง
@@ -120,8 +120,8 @@ class SharkyGoGame(Widget):
         self.score = 0
         self.game_over = False
         self.pipe_speed = -5 # ความเร็วท่อ Begin
+        self.speed_boosted_30 = False # รีความเร็วท่อ
         self.speed_boosted_50 = False # รีความเร็วท่อ
-        self.speed_boosted_100 = False # รีความเร็วท่อ
 
         if self.Epic_music:
             self.Epic_music.stop()
