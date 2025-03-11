@@ -12,17 +12,33 @@ import random
 
 class MenuScreen(Screen):
     volume = NumericProperty(0.5)
+    background_music = None  # ใช้เป็นตัวแปรคลาสเพื่อป้องกันการโหลดซ้ำ
 
     def on_enter(self):
         screen_width = Window.width
         screen_height = Window.height
         print(f"Screen Width: {screen_width}, Screen Height: {screen_height}")
-                
+
+        if MenuScreen.background_music is None:
+            MenuScreen.background_music = SoundLoader.load('assets/sounds/BackgroundMermaid.mp3')
+            if MenuScreen.background_music:
+                MenuScreen.background_music.loop = True
+                MenuScreen.background_music.volume = self.volume
+                MenuScreen.background_music.play()
+        else:
+            # ถ้ามีเพลงเล่นอยู่แล้ว ให้ปรับระดับเสียงโดยไม่ต้องโหลดซ้ำ
+            MenuScreen.background_music.volume = self.volume
+
     def adjust_volume(self, value):
-        #ปรับเสียงพื้นหลัง
         self.volume = value
-        if hasattr(self, 'background_music') and self.background_music:
-            self.background_music.volume = value
+        if MenuScreen.background_music:
+            MenuScreen.background_music.volume = value
+
+    def on_leave(self):
+        if MenuScreen.background_music:
+            MenuScreen.background_music.stop()
+            MenuScreen.background_music = None
+
 
 class GameScreen(Screen):
     def on_enter(self):
@@ -45,22 +61,7 @@ class SharkyGoGame(Widget):
         Window.bind(on_key_down=self.on_key_down)
         self.volume = 0.5
         self.collision_sound = SoundLoader.load('assets/sounds/hitcute.mp3')
-        self.background_music = SoundLoader.load('assets/sounds/BackgroundMermaid.mp3')
         self.Epic_music = SoundLoader.load('assets/sounds/BackgroundEpic.mp3')
-
-        if self.background_music:
-            self.background_music.loop = True
-            self.background_music.volume = self.volume
-            self.background_music.play()
-
-        def adjust_volume(self, value):
-            self.volume = value
-            if self.background_music:
-                self.background_music.volume = value
-            if self.Epic_music:
-                self.Epic_music.volume = value
-            if self.collision_sound:
-                self.collision_sound.volume = value
 
         self.background = Image(source='assets/images/background.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(self.background)
@@ -71,6 +72,7 @@ class SharkyGoGame(Widget):
                 self.restart_game()
             else:
                 self.shark.jump()
+                
     def update(self, dt):
         if self.game_over:
             return  # จบแล้วพอ อย่ายื้อ เอื้อ เจ็บ
