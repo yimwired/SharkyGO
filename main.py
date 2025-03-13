@@ -46,6 +46,11 @@ class MenuScreen(Screen):
                 self.music_paused = True
                 instance.background_normal = 'assets/images/play.png'  # เปลี่ยนรูปเมื่อปิดเสียง
                 instance.background_down = 'assets/images/mute.png'
+
+                game_screen = self.manager.get_screen('game')
+                if game_screen and hasattr(game_screen.ids, 'game'):
+                    if game_screen.ids.game.Epic_music:
+                        game_screen.ids.game.Epic_music.stop()
             else:
                 MenuScreen.background_music.play()  # เล่นเสียงเพลง
                 self.music_paused = False
@@ -122,12 +127,14 @@ class SharkyGoGame(Widget):
             self.change_background('assets/images/new_background2.png')
             self.top_pipe.source = 'assets/images/iceRotate.png'
             self.bottom_pipe.source = 'assets/images/ice.png'
-            if self.Epic_music:
-                self.Epic_music.play()
+            menu_screen = self.parent.parent.get_screen('menu')
+            if menu_screen and not menu_screen.music_paused:  # ตรวจสอบสถานะ music_paused
+                if self.Epic_music:
+                    self.Epic_music.play()
             self.speed_boosted_50 = True
             MenuScreen.background_music.stop()
             print("God Mode!!!")
-
+            
     def change_background(self, new_background): # ฟังก์ชันเปลี่ยนพื้นหลัง
         self.background.source = new_background
         self.background.reload()
