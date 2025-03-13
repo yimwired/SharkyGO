@@ -2,13 +2,12 @@
 from kivy.app import App
 from kivy.uix.widget import Widget, ObjectProperty
 from kivy.uix.image import Image
-from kivy.properties import NumericProperty, BooleanProperty, ReferenceListProperty
+from kivy.properties import NumericProperty, BooleanProperty, ReferenceListProperty, ListProperty
 from kivy.vector import Vector
 from kivy.core.audio import SoundLoader
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.uix.button import Button
 
 import random
 
@@ -50,12 +49,6 @@ class GameScreen(Screen):
         Clock.schedule_interval(self.game.update, 1.0 / 60.0)
 
 class SharkyGoGame(Widget):
-    def toggle_music(self, instance=None):
-        if MenuScreen.background_music:
-            if MenuScreen.background_music.state == 'play':
-                MenuScreen.background_music.stop()
-            else:
-                MenuScreen.background_music.play()
     shark = ObjectProperty(None)
     top_pipe = ObjectProperty(None)
     bottom_pipe = ObjectProperty(None)
@@ -90,9 +83,6 @@ class SharkyGoGame(Widget):
         self.shark.move()
         self.top_pipe.move()
         self.bottom_pipe.move()
-
-        self.top_pipe.flop_pipe()  # กลับหัวท่อบน
-        self.bottom_pipe.normal_pipe()
 
         if self.shark.y <= 0 or self.shark.top >= self.height:
             self.end_game()  # เรียกฟังก์ชันจบเกมตอนชนบนล่าง
@@ -204,16 +194,9 @@ class Pipe(Image):
         self.source = 'assets/images/kelp.png'
         self.allow_stretch = True
         self.keep_ratio = False
-        self.angle = 180  # ตั้งค่าให้รูปภาพกลับหัวตั้งแต่เริ่มต้น
 
     def move(self):
         self.x += self.velocity_x
-
-    def flop_pipe(self):
-        self.angle = 180  # กลับหัว
-
-    def normal_pipe(self):
-        self.angle = 0  # ปกติ
 
 class Shark(Image):
     velocity = ReferenceListProperty(NumericProperty(0), NumericProperty(0))
