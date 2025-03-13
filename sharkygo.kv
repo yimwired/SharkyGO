@@ -10,6 +10,18 @@
                 pos: self.pos
                 size: self.size
                 source: 'assets/images/new_background.png'
+            
+        FloatLayout:
+            size_hint: 1, 1
+
+        ToggleButton:
+            id: music_toggle
+            size_hint: None, None
+            size: 70, 53
+            pos_hint: {"right": 1, "top": 1}
+            background_normal: 'assets/images/play.png' if self.state == 'normal' else 'assets/images/mute.png'
+            background_down: 'assets/images/mute.png' if self.state == 'normal' else 'assets/images/play.png'
+            on_state: root.toggle_music(self)
 
         Label:
             text: 'SharkyGo'
@@ -48,7 +60,6 @@
             size_hint_y: None
             height: 50
             on_value: root.adjust_volume(self.value)
-
 
         Button:
             text: 'QUIT'
@@ -91,15 +102,15 @@
 
     Pipe:
         id: top_pipe
-        size: 100, 400
+        size: 100, 350
         size_hint: None, None
         pos: root.width, root.height - 300
-        angle: 180
         origin: self.center
+        angle: 180
 
     Pipe:
         id: bottom_pipe
-        size: 100, 400
+        size: 100, 350
         size_hint: None, None
         pos: root.width, 0
 

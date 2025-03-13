@@ -32,16 +32,17 @@ class MenuScreen(Screen):
         if MenuScreen.background_music:
             MenuScreen.background_music.volume = value
 
-    def toggle_music(self, instance=None):
+    def toggle_music(self, instance):
         if MenuScreen.background_music:
             if MenuScreen.background_music.state == 'play':
-                MenuScreen.background_music.stop()
+                MenuScreen.background_music.stop()  # หยุดเสียงเพลง
+                instance.background_normal = 'assets/images/play.png'  # เปลี่ยนรูปเมื่อปิดเสียง
+                instance.background_down = 'assets/images/mute.png'
             else:
-                MenuScreen.background_music.play()
+                MenuScreen.background_music.play()  # เล่นเสียงเพลง
 
     def on_leave(self):
         pass
-
 
 class GameScreen(Screen):
     def on_enter(self):
@@ -74,10 +75,6 @@ class SharkyGoGame(Widget):
         
         self.background = Image(source='assets/images/background.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(self.background)
-        
-        self.music_button = Button(text='🔊', size_hint=(None, None), size=(50, 50), pos=(Window.width - 60, Window.height - 60))
-        self.music_button.bind(on_press=self.toggle_music)
-        self.add_widget(self.music_button)
 
     def on_key_down(self, window, key, *args):
         if key == 32:  # Spacebar key
@@ -93,6 +90,9 @@ class SharkyGoGame(Widget):
         self.shark.move()
         self.top_pipe.move()
         self.bottom_pipe.move()
+
+        self.top_pipe.flop_pipe()  # กลับหัวท่อบน
+        self.bottom_pipe.normal_pipe()
 
         if self.shark.y <= 0 or self.shark.top >= self.height:
             self.end_game()  # เรียกฟังก์ชันจบเกมตอนชนบนล่าง
@@ -110,12 +110,16 @@ class SharkyGoGame(Widget):
         if self.score >= 30 and not self.speed_boosted_30: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
             self.pipe_speed -= 2  # ท่อเคลื่อนที่เร็วขึ้น
             self.change_background('assets/images/new_background.png')
+            self.top_pipe.source = 'assets/images/rockRotate.png'
+            self.bottom_pipe.source = 'assets/images/rock.png'
             self.speed_boosted_30 = True
             print("Harder!!!")
 
         if self.score >= 50 and not self.speed_boosted_50: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
             self.pipe_speed -= 2.5  # ท่อเร็วขึ้นอีก
             self.change_background('assets/images/new_background2.png')
+            self.top_pipe.source = 'assets/images/iceRotate.png'
+            self.bottom_pipe.source = 'assets/images/ice.png'
             if self.Epic_music:
                 self.Epic_music.play()
             self.speed_boosted_50 = True
@@ -151,6 +155,9 @@ class SharkyGoGame(Widget):
         self.shark.velocity = Vector(0, 0)  # รีความเร็ว
         self.reset_pipes()
         Clock.schedule_interval(self.update, 1.0 / 60.0)  # ทำให้เกมเริ่มใหม่
+
+        self.top_pipe.source = 'assets/images/kelpRotate.png'
+        self.bottom_pipe.source = 'assets/images/kelp.png'
 
         gameover = self.ids.gameover
         gameover.opacity = 0
@@ -190,16 +197,23 @@ class SharkyGoGame(Widget):
         self.bottom_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
 
 class Pipe(Image):
-    velocity_x = NumericProperty(-5) # ความเร็วท่อ
+    velocity_x = NumericProperty(-5)  # ความเร็วท่อ
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.source = 'assets/images/kelp.png'
         self.allow_stretch = True
         self.keep_ratio = False
+        self.angle = 180  # ตั้งค่าให้รูปภาพกลับหัวตั้งแต่เริ่มต้น
 
     def move(self):
         self.x += self.velocity_x
+
+    def flop_pipe(self):
+        self.angle = 180  # กลับหัว
+
+    def normal_pipe(self):
+        self.angle = 0  # ปกติ
 
 class Shark(Image):
     velocity = ReferenceListProperty(NumericProperty(0), NumericProperty(0))
