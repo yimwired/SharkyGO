@@ -14,6 +14,7 @@ import random
 class MenuScreen(Screen):
     volume = NumericProperty(0.5)
     background_music = None  # ใช้เป็นตัวแปรคลาสเพื่อป้องกันการโหลดซ้ำ
+    music_paused = BooleanProperty(False)
 
     def on_enter(self):
         if MenuScreen.background_music is None:
@@ -25,23 +26,29 @@ class MenuScreen(Screen):
         else:
             # ถ้ามีเพลงเล่นอยู่แล้ว ให้ปรับระดับเสียงโดยไม่ต้องโหลดซ้ำ
             MenuScreen.background_music.volume = self.volume
+            if not self.music_paused:  # ตรวจสอบสถานะของเพลง
+                MenuScreen.background_music.play()
 
     def adjust_volume(self, value):
         self.volume = value
         if MenuScreen.background_music:
             MenuScreen.background_music.volume = value
+    
+    # ส่งค่า volume ไปยัง GameScreen
+        game_screen = self.manager.get_screen('game')
+        if game_screen and hasattr(game_screen.ids, 'game'):  # ตรวจสอบว่า game มีอยู่ใน ids หรือไม่
+            game_screen.ids.game.adjust_epic_music_volume(value)
 
     def toggle_music(self, instance):
         if MenuScreen.background_music:
             if MenuScreen.background_music.state == 'play':
                 MenuScreen.background_music.stop()  # หยุดเสียงเพลง
+                self.music_paused = True
                 instance.background_normal = 'assets/images/play.png'  # เปลี่ยนรูปเมื่อปิดเสียง
                 instance.background_down = 'assets/images/mute.png'
             else:
                 MenuScreen.background_music.play()  # เล่นเสียงเพลง
-
-    def on_leave(self):
-        pass
+                self.music_paused = False
 
 class GameScreen(Screen):
     def on_enter(self):
@@ -68,6 +75,11 @@ class SharkyGoGame(Widget):
         
         self.background = Image(source='assets/images/background.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(self.background)
+
+    def adjust_epic_music_volume(self, volume):
+        self.volume = volume
+        if self.Epic_music:
+            self.Epic_music.volume = volume
 
     def on_key_down(self, window, key, *args):
         if key == 32:  # Spacebar key
@@ -138,8 +150,9 @@ class SharkyGoGame(Widget):
 
         self.change_background('assets/images/background.png')
 
-        if MenuScreen.background_music and MenuScreen.background_music.state != 'play':
-            MenuScreen.background_music.play()
+        menu_screen = self.parent.parent.get_screen('menu')
+        if menu_screen and menu_screen.background_music and not menu_screen.music_paused:
+            menu_screen.background_music.play()
 
         self.shark.y = self.height / 2  # รีน้องฉลาม
         self.shark.velocity = Vector(0, 0)  # รีความเร็ว
