@@ -151,8 +151,12 @@ class SharkyGoGame(Widget):
         self.change_background('assets/images/background.png')
 
         menu_screen = self.parent.parent.get_screen('menu')
-        if menu_screen and menu_screen.background_music and not menu_screen.music_paused:
-            menu_screen.background_music.play()
+        if menu_screen and menu_screen.background_music:
+            if menu_screen.background_music.state == 'stop' and not menu_screen.music_paused:
+                menu_screen.background_music.play()
+            elif menu_screen.background_music.state == 'play':
+                # เพลงกำลังเล่นอยู่แล้ว ไม่ต้องทำอะไร
+                pass
 
         self.shark.y = self.height / 2  # รีน้องฉลาม
         self.shark.velocity = Vector(0, 0)  # รีความเร็ว
