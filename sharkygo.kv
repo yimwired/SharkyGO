@@ -14,6 +14,28 @@
         FloatLayout:
             size_hint: 1, 1
 
+            # เพิ่ม Animation ให้กับป้ายชื่อเกม
+            Label:
+                id: title
+                text: 'SharkyGo'
+                font_size: 70
+                bold: True
+                font_name: 'assets/fonts/Pixellettersfull-BnJ5.ttf'
+                color: 1, 1, 1, 1
+                size_hint_y: None
+                height: 120
+                pos_hint: {"center_x": 0.5, "top": 1.2}
+                canvas.before:
+                    PushMatrix
+                    Scale:
+                        origin: self.center
+                        x: root.scale  # ใช้ scale จาก MenuScreen
+                        y: root.scale  # ใช้ scale จาก MenuScreen
+                canvas.after:
+                    PopMatrix
+
+                on_parent: root.animate_title(self)  # เรียกฟังก์ชัน animate_title เมื่อ Label ถูกเพิ่มเข้าไปใน parent
+
         ToggleButton:
             id: music_toggle
             size_hint: None, None
@@ -22,15 +44,6 @@
             background_normal: 'assets/images/play.png' if self.state == 'normal' else 'assets/images/mute.png'
             background_down: 'assets/images/mute.png' if self.state == 'normal' else 'assets/images/play.png'
             on_state: root.toggle_music(self)
-
-        Label:
-            text: 'SharkyGo'
-            font_size: 70
-            bold: True
-            font_name: 'assets/fonts/Pixellettersfull-BnJ5.ttf'
-            color: 1, 1, 1, 1
-            size_hint_y: None
-            height: 120
 
         Button:
             text: 'START GAME'
@@ -72,6 +85,13 @@
             size_hint_y: None
             height: 90
             on_press: app.stop()
+            canvas.before:
+                Color:
+                    rgba: 0.7, 0.2, 0.2, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [20,]
 
         Label:
             text: 'Created by 6710110132, 6710110109'
@@ -130,7 +150,7 @@
             disabled: True
             size_hint: None, None
             size: 300, 100
-            pos_hint: {"center_x": 0.5, "center_y": 0.7}
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
 
 <Shark>:
     size_hint: None, None

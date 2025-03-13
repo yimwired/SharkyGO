@@ -8,13 +8,21 @@ from kivy.core.audio import SoundLoader
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.animation import Animation
 
 import random
 
 class MenuScreen(Screen):
     volume = NumericProperty(0.5)
-    background_music = None  # ใช้เป็นตัวแปรคลาสเพื่อป้องกันการโหลดซ้ำ
+    background_music = None
     music_paused = BooleanProperty(False)
+    scale = NumericProperty(1)  # เพิ่ม property สำหรับการขยายขนาด
+
+    def animate_title(self, instance):
+        # สร้าง Animation เพื่อปรับ scale
+        anim = Animation(scale=1.1, duration=1) + Animation(scale=1, duration=1)
+        anim.repeat = True
+        anim.start(self)
 
     def on_enter(self):
         if MenuScreen.background_music is None:
@@ -134,7 +142,7 @@ class SharkyGoGame(Widget):
             self.speed_boosted_50 = True
             MenuScreen.background_music.stop()
             print("God Mode!!!")
-            
+
     def change_background(self, new_background): # ฟังก์ชันเปลี่ยนพื้นหลัง
         self.background.source = new_background
         self.background.reload()
