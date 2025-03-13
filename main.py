@@ -2,12 +2,14 @@
 from kivy.app import App
 from kivy.uix.widget import Widget, ObjectProperty
 from kivy.uix.image import Image
-from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty, BooleanProperty
+from kivy.properties import NumericProperty, BooleanProperty, ReferenceListProperty
 from kivy.vector import Vector
 from kivy.core.audio import SoundLoader
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.uix.button import Button
+
 import random
 
 class MenuScreen(Screen):
@@ -15,10 +17,6 @@ class MenuScreen(Screen):
     background_music = None  # ใช้เป็นตัวแปรคลาสเพื่อป้องกันการโหลดซ้ำ
 
     def on_enter(self):
-        screen_width = Window.width
-        screen_height = Window.height
-        print(f"Screen Width: {screen_width}, Screen Height: {screen_height}")
-
         if MenuScreen.background_music is None:
             MenuScreen.background_music = SoundLoader.load('assets/sounds/BackgroundMermaid.mp3')
             if MenuScreen.background_music:
@@ -34,10 +32,15 @@ class MenuScreen(Screen):
         if MenuScreen.background_music:
             MenuScreen.background_music.volume = value
 
-    def on_leave(self):
+    def toggle_music(self, instance=None):
         if MenuScreen.background_music:
-            MenuScreen.background_music.stop()
-            MenuScreen.background_music = None
+            if MenuScreen.background_music.state == 'play':
+                MenuScreen.background_music.stop()
+            else:
+                MenuScreen.background_music.play()
+
+    def on_leave(self):
+        pass
 
 
 class GameScreen(Screen):
@@ -46,6 +49,12 @@ class GameScreen(Screen):
         Clock.schedule_interval(self.game.update, 1.0 / 60.0)
 
 class SharkyGoGame(Widget):
+    def toggle_music(self, instance=None):
+        if MenuScreen.background_music:
+            if MenuScreen.background_music.state == 'play':
+                MenuScreen.background_music.stop()
+            else:
+                MenuScreen.background_music.play()
     shark = ObjectProperty(None)
     top_pipe = ObjectProperty(None)
     bottom_pipe = ObjectProperty(None)
@@ -62,9 +71,13 @@ class SharkyGoGame(Widget):
         self.volume = 0.5
         self.collision_sound = SoundLoader.load('assets/sounds/hitcute.mp3')
         self.Epic_music = SoundLoader.load('assets/sounds/BackgroundEpic.mp3')
-
+        
         self.background = Image(source='assets/images/background.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(self.background)
+        
+        self.music_button = Button(text='🔊', size_hint=(None, None), size=(50, 50), pos=(Window.width - 60, Window.height - 60))
+        self.music_button.bind(on_press=self.toggle_music)
+        self.add_widget(self.music_button)
 
     def on_key_down(self, window, key, *args):
         if key == 32:  # Spacebar key
@@ -106,6 +119,7 @@ class SharkyGoGame(Widget):
             if self.Epic_music:
                 self.Epic_music.play()
             self.speed_boosted_50 = True
+            MenuScreen.background_music.stop()
             print("God Mode!!!")
 
     def change_background(self, new_background): # ฟังก์ชันเปลี่ยนพื้นหลัง
@@ -129,6 +143,9 @@ class SharkyGoGame(Widget):
             self.Epic_music.stop()
 
         self.change_background('assets/images/background.png')
+
+        if MenuScreen.background_music and MenuScreen.background_music.state != 'play':
+            MenuScreen.background_music.play()
 
         self.shark.y = self.height / 2  # รีน้องฉลาม
         self.shark.velocity = Vector(0, 0)  # รีความเร็ว
