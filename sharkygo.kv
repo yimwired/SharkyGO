@@ -14,7 +14,6 @@
         FloatLayout:
             size_hint: 1, 1
 
-            # เพิ่ม Animation ให้กับป้ายชื่อเกม
             Label:
                 id: title
                 text: 'SharkyGo'
@@ -24,17 +23,17 @@
                 color: 1, 1, 1, 1
                 size_hint_y: None
                 height: 120
-                pos_hint: {"center_x": 0.5, "top": 1.2}
+                pos_hint: {"center_x": 0.5, "top": 1}
                 canvas.before:
                     PushMatrix
                     Scale:
                         origin: self.center
-                        x: root.scale  # ใช้ scale จาก MenuScreen
-                        y: root.scale  # ใช้ scale จาก MenuScreen
+                        x: root.scale
+                        y: root.scale
                 canvas.after:
                     PopMatrix
 
-                on_parent: root.animate_title(self)  # เรียกฟังก์ชัน animate_title เมื่อ Label ถูกเพิ่มเข้าไปใน parent
+                on_parent: root.animate_title(self)
 
         ToggleButton:
             id: music_toggle
@@ -47,15 +46,31 @@
 
         Button:
             text: 'START GAME'
-            font_size: 32
+            font_size: 36
             bold: True
             font_name: 'assets/fonts/Pixellettersfull-BnJ5.ttf'
             background_normal: ''
-            background_color: 0.2, 0.7, 0.2, 1
+            background_color: 0.0, 0.6, 0.0, 1
             color: 1, 1, 1, 1
-            size_hint_y: None
-            height: 90
-            on_press: root.manager.current = 'game'
+            size_hint: None, None
+            size: 280, 100
+            pos_hint: {"center_x": 0.5}
+    
+            canvas.before:
+                Color:
+                    rgba: 0.2, 0.8, 0.2, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [30,]
+
+            on_press:
+                self.background_color = (0.1, 0.5, 0.1, 1)
+                self.size = (270, 95)
+            on_release:
+                self.background_color = (0.0, 0.6, 0.0, 1)
+                self.size = (280, 100)
+                root.manager.current = 'game'
 
         Label:
             text: 'Volume'
@@ -70,8 +85,9 @@
             min: 0
             max: 1
             value: root.volume
-            size_hint_y: None
-            height: 50
+            size_hint: None, None
+            size: 280, 100
+            pos_hint: {"center_x": 0.5}
             on_value: root.adjust_volume(self.value)
 
         Button:
@@ -82,16 +98,26 @@
             background_normal: ''
             background_color: 0.7, 0.2, 0.2, 1
             color: 1, 1, 1, 1
-            size_hint_y: None
-            height: 90
-            on_press: app.stop()
+            size_hint: None, None
+            size: 280, 100
+            pos_hint: {"center_x": 0.5}
+    
             canvas.before:
                 Color:
-                    rgba: 0.7, 0.2, 0.2, 1
+                    rgba: 0.2, 0.8, 0.2, 1
                 RoundedRectangle:
                     pos: self.pos
                     size: self.size
-                    radius: [20,]
+                    radius: [30,]
+            
+            on_press:
+                self.background_color = (0.1, 0.5, 0.1, 1)
+                self.size = (270, 95)
+            on_release:
+                self.background_color = (0.2, 0.8, 0.2, 1)
+                self.size = (280, 100)
+
+            on_press: app.stop()
 
         Label:
             text: 'Created by 6710110132, 6710110109'
