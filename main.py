@@ -116,13 +116,13 @@ class SharkyGoGame(Widget):
             self.end_game()  # เรียกฟังก์ชันจบเกมชนobject
 
         if not self.pipe_passed and self.shark.x > self.top_pipe.x + self.top_pipe.width:
-            self.score += 30
+            self.score += 1
             self.pipe_passed = True  # ป้องกันนับซ้ำหลังผ่านท่อ
 
         if self.top_pipe.x < -50:
             self.reset_pipes() # ท่อหมดจอ
 
-        if self.score >= 30 and not self.speed_boosted_30: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
+        if self.score >= 5 and not self.speed_boosted_30: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
             self.pipe_speed -= 2  # ท่อเคลื่อนที่เร็วขึ้น
             self.change_background('assets/images/new_background.png')
             self.top_pipe.source = 'assets/images/rockRotate.png'
@@ -130,7 +130,7 @@ class SharkyGoGame(Widget):
             self.speed_boosted_30 = True
             print("Harder!!!")
 
-        if self.score >= 50 and not self.speed_boosted_50: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
+        if self.score >= 10 and not self.speed_boosted_50: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
             self.pipe_speed -= 2.5  # ท่อเร็วขึ้นอีก
             self.change_background('assets/images/new_background2.png')
             self.top_pipe.source = 'assets/images/iceRotate.png'
