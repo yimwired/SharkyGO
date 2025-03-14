@@ -1,4 +1,4 @@
-#main.py
+# main.py
 from kivy.app import App
 from kivy.uix.widget import Widget, ObjectProperty
 from kivy.uix.image import Image
@@ -68,14 +68,48 @@ class GameScreen(Screen):
         self.game = self.ids.game
         Clock.schedule_interval(self.game.update, 1.0 / 60.0)
 
+class PipePair(Widget):
+    velocity_x = NumericProperty(-5)
+    passed = BooleanProperty(False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.top_pipe = Pipe()
+        self.bottom_pipe = Pipe()
+        self.add_widget(self.top_pipe)
+        self.add_widget(self.bottom_pipe)
+        self.gap = 200
+        self.reset()
+    def reset(self):
+        min_height = 50
+        parent_height = self.parent.height if self.parent else 600
+        max_height = parent_height - self.gap - min_height
+
+        # ตรวจสอบว่า max_height ต้องมากกว่า min_height
+        if max_height < min_height:
+            max_height = min_height + 10  # ปรับค่า max_height ให้มากกว่า min_height
+
+        pipe_height = random.randint(min_height, max_height)
+
+        self.bottom_pipe.size = (100, pipe_height)
+        self.bottom_pipe.pos = (self.x, 0)
+
+        top_pipe_height = parent_height - (pipe_height + self.gap)
+        self.top_pipe.size = (100, top_pipe_height)
+        self.top_pipe.pos = (self.x, pipe_height + self.gap)
+
+        self.x = self.parent.width if self.parent else 0
+
+    def move(self):
+        self.x += self.velocity_x
+        self.top_pipe.x = self.x
+        self.bottom_pipe.x = self.x
+
 class SharkyGoGame(Widget):
     shark = ObjectProperty(None)
-    top_pipe = ObjectProperty(None)
-    bottom_pipe = ObjectProperty(None)
     score = NumericProperty(0)
-    pipe_passed = BooleanProperty(False)
-    game_over = False  # จนกว่าจะจบ
-    pipe_speed = NumericProperty(-5)  #ความเร็วท่อ Begin
+    game_over = False
+    pipe_speed = NumericProperty(-5)
     speed_boosted_30 = BooleanProperty(False)
     speed_boosted_50 = BooleanProperty(False)
 
@@ -88,6 +122,41 @@ class SharkyGoGame(Widget):
         
         self.background = Image(source='assets/images/background.png', allow_stretch=True, keep_ratio=False)
         self.add_widget(self.background)
+
+        self.pipes = []
+        self.spawn_event = None
+        self.start_spawning_pipes()
+
+    def start_spawning_pipes(self):
+        if self.spawn_event is not None:
+            self.spawn_event.cancel()
+        interval = self.calculate_spawn_interval()
+        self.spawn_event = Clock.schedule_interval(self.spawn_pipes, interval)
+
+    def calculate_spawn_interval(self):
+        desired_spacing = 400
+        speed = abs(self.pipe_speed)
+        return desired_spacing / (speed * 60)
+
+    def on_pipe_speed(self, instance, value):
+        self.start_spawning_pipes()
+
+    def spawn_pipes(self, dt):
+        pipe_pair = PipePair()
+        pipe_pair.velocity_x = self.pipe_speed
+        # ตั้งค่าภาพท่อตามพื้นหลังปัจจุบัน
+        if self.speed_boosted_50:
+            pipe_pair.top_pipe.source = 'assets/images/iceRotate.png'
+            pipe_pair.bottom_pipe.source = 'assets/images/ice.png'
+        elif self.speed_boosted_30:
+            pipe_pair.top_pipe.source = 'assets/images/rockRotate.png'
+            pipe_pair.bottom_pipe.source = 'assets/images/rock.png'
+        else:
+            pipe_pair.top_pipe.source = 'assets/images/kelpRotate.png'
+            pipe_pair.bottom_pipe.source = 'assets/images/kelp.png'
+        self.add_widget(pipe_pair)
+        self.pipes.append(pipe_pair)
+        pipe_pair.reset()
 
     def adjust_epic_music_volume(self, volume):
         self.volume = volume
@@ -106,35 +175,31 @@ class SharkyGoGame(Widget):
             return  # จบแล้วพอ อย่ายื้อ เอื้อ เจ็บ
 
         self.shark.move()
-        self.top_pipe.move()
-        self.bottom_pipe.move()
 
-        if self.shark.y <= 0 or self.shark.top >= self.height:
-            self.end_game()  # เรียกฟังก์ชันจบเกมตอนชนบนล่าง
+        for pipe_pair in self.pipes[:]:
+            pipe_pair.move()
 
-        if self.shark.collide_widget(self.top_pipe) or self.shark.collide_widget(self.bottom_pipe):
-            self.end_game()  # เรียกฟังก์ชันจบเกมชนobject
+            if pipe_pair.x < -pipe_pair.top_pipe.width:
+                self.remove_widget(pipe_pair)
+                self.pipes.remove(pipe_pair)
+                continue
 
-        if not self.pipe_passed and self.shark.x > self.top_pipe.x + self.top_pipe.width:
-            self.score += 5
-            self.pipe_passed = True  # ป้องกันนับซ้ำหลังผ่านท่อ
+            if self.shark.collide_widget(pipe_pair.top_pipe) or self.shark.collide_widget(pipe_pair.bottom_pipe):
+                self.end_game()
 
-        if self.top_pipe.x < -50:
-            self.reset_pipes() # ท่อหมดจอ
+            if not pipe_pair.passed and self.shark.x > pipe_pair.x + pipe_pair.top_pipe.width:
+                self.score += 5
+                pipe_pair.passed = True
 
         if self.score >= 10 and not self.speed_boosted_30: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
             self.pipe_speed -= 2  # ท่อเคลื่อนที่เร็วขึ้น
             self.change_background('assets/images/new_background.png')
-            self.top_pipe.source = 'assets/images/rockRotate.png'
-            self.bottom_pipe.source = 'assets/images/rock.png'
             self.speed_boosted_30 = True
             print("Harder!!!")
 
         if self.score >= 20 and not self.speed_boosted_50: # สร้างเงื่อนไขให้มีการเช็คครั้งเดียว
             self.pipe_speed -= 2.5  # ท่อเร็วขึ้นอีก
             self.change_background('assets/images/new_background2.png')
-            self.top_pipe.source = 'assets/images/iceRotate.png'
-            self.bottom_pipe.source = 'assets/images/ice.png'
             menu_screen = self.parent.parent.get_screen('menu')
             if menu_screen and not menu_screen.music_paused:  # ตรวจสอบสถานะ music_paused
                 if self.Epic_music:
@@ -143,9 +208,20 @@ class SharkyGoGame(Widget):
             MenuScreen.background_music.stop()
             print("God Mode!!!")
 
-    def change_background(self, new_background): # ฟังก์ชันเปลี่ยนพื้นหลัง
+    def change_background(self, new_background):
         self.background.source = new_background
         self.background.reload()
+        # อัปเดตภาพท่อที่มีอยู่
+        for pipe_pair in self.pipes:
+            if self.speed_boosted_50:
+                pipe_pair.top_pipe.source = 'assets/images/iceRotate.png'
+                pipe_pair.bottom_pipe.source = 'assets/images/ice.png'
+            elif self.speed_boosted_30:
+                pipe_pair.top_pipe.source = 'assets/images/rockRotate.png'
+                pipe_pair.bottom_pipe.source = 'assets/images/rock.png'
+            else:
+                pipe_pair.top_pipe.source = 'assets/images/kelpRotate.png'
+                pipe_pair.bottom_pipe.source = 'assets/images/kelp.png'
 
     def on_touch_down(self, touch):
         if self.game_over:
@@ -175,11 +251,12 @@ class SharkyGoGame(Widget):
 
         self.shark.y = self.height / 2  # รีน้องฉลาม
         self.shark.velocity = Vector(0, 0)  # รีความเร็ว
-        self.reset_pipes()
+        # ลบท่อทั้งหมด
+        for pipe_pair in self.pipes:
+            self.remove_widget(pipe_pair)
+        self.pipes = []
+        self.start_spawning_pipes()
         Clock.schedule_interval(self.update, 1.0 / 60.0)  # ทำให้เกมเริ่มใหม่
-
-        self.top_pipe.source = 'assets/images/kelpRotate.png'
-        self.bottom_pipe.source = 'assets/images/kelp.png'
 
         gameover = self.ids.gameover
         gameover.opacity = 0
@@ -198,25 +275,6 @@ class SharkyGoGame(Widget):
         gameover = self.ids.gameover
         gameover.opacity = 1
         gameover.disabled = False
-
-    def reset_pipes(self):
-        gap = 200  # ระยะห่างท่อ
-        min_height = 50
-        max_height = self.height - gap - min_height
-
-        pipe_height = random.randint(min_height, max_height)
-
-        self.top_pipe.x = self.width
-        self.bottom_pipe.y = 0  # ท่อบน
-        self.bottom_pipe.height = pipe_height
-
-        self.bottom_pipe.x = self.width
-        self.top_pipe.y = pipe_height + gap
-        self.top_pipe.height = self.height - (pipe_height + gap)  # ท่อล่าง
-
-        self.pipe_passed = False  # reset คะแนน
-        self.top_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
-        self.bottom_pipe.velocity_x = self.pipe_speed  # ปรับความเร็วของท่อ
 
 class Pipe(Image):
     velocity_x = NumericProperty(-5)  # ความเร็วท่อ
